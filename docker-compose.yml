@@ -1,0 +1,26 @@
+services:
+  runner:
+    build:
+      context: .
+      args:
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+    container_name: sandbox-runner
+    ports:
+      - "127.0.0.1:8000:8000"        # reachable only from this machine
+    environment:
+      - RUNNER_API_KEY=${RUNNER_API_KEY:-}   # set in .env to require X-API-Key
+      - TEST_TIMEOUT_SEC=100
+    volumes:
+      - runner-data:/data
+    mem_limit: 2g
+    cpus: 2
+    pids_limit: 512
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=512m
+    restart: unless-stopped
+
+volumes:
+  runner-data:
